@@ -32,21 +32,21 @@ pipeline {
     stage ('Artifactory configuration') {
             steps {
                 rtServer (
-                    id: "jfrog",
+                    id: "JFrog",
                     url: "https://sandya.jfrog.io/artifactory",
                     credentialsId: "JFrog"
                 )
 
                 rtMavenDeployer (
                     id: "MAVEN_DEPLOYER",
-                    serverId: "jfrog",
+                    serverId: "JFrog",
                     releaseRepo: "mvn01-libs-release-local",
                     snapshotRepo: "mvn01-libs-snapshot-local"
                 )
 
                 rtMavenResolver (
                     id: "MAVEN_RESOLVER",
-                    serverId: "jfrog",
+                    serverId: "JFrog",
                     releaseRepo: "default-maven-virtual",
                     snapshotRepo: "default-maven-virtual"
                 )
