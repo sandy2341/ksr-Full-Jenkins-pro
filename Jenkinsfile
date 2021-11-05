@@ -7,7 +7,7 @@ pipeline {
 
   stage ('Checkout SCM'){
         steps {
-          checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'git', url: 'https://dptrealtime@bitbucket.org/dptrealtime/webapp-cicd-integrations.git']]])
+          checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'git', url: 'https://github.com/sandy2341/ksr-Full-Jenkins-pro.git']]])
       }
    }
 	  
@@ -23,7 +23,7 @@ pipeline {
     steps {
       withSonarQubeEnv('sonar') {           
 				dir('app'){
-          sh 'mvn verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=stskey'
+          sh 'mvn verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=cicd_project'
         }
     }
     }
@@ -33,15 +33,15 @@ pipeline {
             steps {
                 rtServer (
                     id: "jfrog",
-                    url: "https://dptdemo.jfrog.io/artifactory",
-                    credentialsId: "jfrog"
+                    url: "https://sandya.jfrog.io/artifactory",
+                    credentialsId: "JFrog"
                 )
 
                 rtMavenDeployer (
                     id: "MAVEN_DEPLOYER",
                     serverId: "jfrog",
-                    releaseRepo: "sts-libs-release-local",
-                    snapshotRepo: "sts-libs-snapshot-local"
+                    releaseRepo: "mvn01-libs-release-local",
+                    snapshotRepo: "mvn01-libs-snapshot-local"
                 )
 
                 rtMavenResolver (
@@ -68,8 +68,8 @@ pipeline {
 stage('Docker Build') {
       steps {
         script {
-              docker.withRegistry( 'https://registry.hub.docker.com', 'docker' ) {
-              def customImage = docker.build("dpthub/webapp")
+              docker.withRegistry( 'https://registry.hub.docker.com', 'dockerHub' ) {
+              def customImage = docker.build("ksrhub/webapp")
               customImage.push()
           }
       }
@@ -86,9 +86,9 @@ stage('Docker Build') {
   stage('Build Helm Charts') {
     steps {
         dir('charts') {
-        withCredentials([usernamePassword(credentialsId: 'jfrog', usernameVariable: 'username', passwordVariable: 'password')]) {
+        withCredentials([usernamePassword(credentialsId: 'JFrog', usernameVariable: 'username', passwordVariable: 'password')]) {
              sh 'sudo /usr/local/bin/helm package webapp'
-             sh 'sudo /usr/local/bin/helm push-artifactory webapp-1.0.tgz https://dptdemo.jfrog.io/artifactory/sts-helm-local --username $username --password $password'
+             sh 'sudo /usr/local/bin/helm push-artifactory webapp-1.0.tgz https://sandya.jfrog.io/artifactory/ksr-helm-local --username $username --password $password'
 		  }
         }
         }
