@@ -69,7 +69,7 @@ stage('Docker Build') {
       steps {
         script {
               docker.withRegistry( 'https://registry.hub.docker.com', 'dockerHub' ) {
-              def customImage = docker.build("dpthub/webapp")
+              def customImage = docker.build("mydoc04/webapp")
               customImage.push()
           }
       }
