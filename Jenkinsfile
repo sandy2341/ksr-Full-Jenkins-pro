@@ -32,21 +32,21 @@ pipeline {
     stage ('Artifactory configuration') {
             steps {
                 rtServer (
-                    id: "JFrog",
+                    id: "jfrog",
                     url: "https://sandya.jfrog.io/artifactory",
                     credentialsId: "JFrog"
                 )
 
                 rtMavenDeployer (
                     id: "MAVEN_DEPLOYER",
-                    serverId: "JFrog",
+                    serverId: "jfrog",
                     releaseRepo: "mvn01-libs-release-local",
                     snapshotRepo: "mvn01-libs-snapshot-local"
                 )
 
                 rtMavenResolver (
                     id: "MAVEN_RESOLVER",
-                    serverId: "JFrog",
+                    serverId: "jfrog",
                     releaseRepo: "default-maven-virtual",
                     snapshotRepo: "default-maven-virtual"
                 )
@@ -56,7 +56,7 @@ pipeline {
     stage ('Deploy Artifacts') {
             steps {
                 rtMavenRun (
-                    tool: "maven", // Tool name from Jenkins configuration
+                    tool: "mvnF", // Tool name from Jenkins configuration
                     pom: 'app/pom.xml',
                     goals: 'clean install',
                     deployerId: "MAVEN_DEPLOYER",
